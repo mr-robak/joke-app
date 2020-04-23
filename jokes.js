@@ -1,4 +1,9 @@
 const jokes = [
+    {
+        age: "18+"
+        nationality:
+        joke: ""
+    },
   {
     joke1: `What is the worst combination of two sicknesses?
     Diarrhea and Alzheimer. You’re running, but you don’t know where.`,

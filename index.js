@@ -1,36 +1,52 @@
-// import express
+// importing the request package so I can use it in this file
 const express = require("express");
 
-// create express server
+// creating a server
 const app = express();
 
-function render(title, message) {
-  const document = `<!DOCTYPE html>
-  <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Test</title>
-  </head>
-  <body>
-      <h1>${title}</h1>
-      <div>${message}</div>
-  </body>
-  </html>`;
-  return document;
-}
+// define a port
+const port = 5000;
+
+// listen on port AND A Callback function
+app.listen(port, () => {
+  console.log(`Listening on port ${port}`);
+});
 
 // register GET  endpoint
 app.get(
-  "/:age/:nationality", // route to listen on  //end point
-  //   onRequest
+  "/:age", // route to listen on  //end point
+  //   on request function
   function (request, response) {
-    console.log(request.params);
-    const { age, nationality } = request.params;
-    response.send(render(age, nationality));
+    // console.log(request.params);
+    const age = parseInt(request.params.age);
+
+    // if (age > 18) {
+    //   console.log(`Age is sufficient ${age}`);
+    // } else {
+    //   console.log(`age is not sufficient`);
+    // }
+
+    const webPage = renderPage(age);
+    response.send(webPage);
   }
   // callback runs when the route is requested
 );
+
+function renderPage(age) {
+  return `<!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+        
+    <title>Age is ${age} </title>
+    </head>
+    <body>
+      <h1>Age is ${age}</h1>
+    </body>
+  </html>
+  
+`;
+}
 
 // // GET /test handler callback function
 // function onRequest(request, response) {
@@ -42,16 +58,12 @@ app.get(
 //     response.send(page);
 //   }
 
-app.get(
-  "/student/:name ", // route to listen on  //end point
-  // callback runs when the route is requested
-  function (request, response) {
-    console.log(request.params);
-    const { age, nationality } = request.params;
-    response.send(render(age, nationality));
-  }
-);
-
-const port = 3000;
-// start listening with 2 arguments: port and a callback function
-app.listen(port, () => console.log(`Listening on :${port}`));
+// app.get(
+//   "/student/:name ", // route to listen on  //end point
+//   // callback runs when the route is requested
+//   function (request, response) {
+//     console.log(request.params);
+//     const { age, nationality } = request.params;
+//     response.send(render(34, name));
+//   }
+// );
