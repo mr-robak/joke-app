@@ -93,8 +93,8 @@ async function getData() {
   </div>
   <div class="${divClass} down">
   <img src="${imageUrl}"/>
-  </div>
-  <a href="/${divClass}" class="myButton">How about another one?</a> `;
+  <a href="/${divClass}" class="myButton">How about another one?</a> </div>
+  `;
 
       return [html, divClass];
     }
@@ -149,19 +149,22 @@ async function getData() {
           background-color: rgb(223, 195, 161);
 
         }
-        div {
+        div {position: relative;
           margin-top: 25px;
           padding: 5px;
           display: block;
-          margin-left: 25%;
-          margin-right: 25%;
-        }
+          margin-left: 30%;
+          margin-right: 30%;
+          }
         .up {
           background-color: rgb(87, 136, 179);
+          max-width: 400px; 
         }
         .down {
           background-color: white;
           position: relative
+          max-height: 500px;
+          max-width: 400px;  
         }
          
 
@@ -223,9 +226,11 @@ async function getData() {
           position:relative;
           top:1px;
         }
-        img {          
-          height: 100%;
-          width: 100%;
+        img {     object-fit: contain;     
+          
+          
+        height:100%;
+        width:100%;
         } 
         
     </style>
