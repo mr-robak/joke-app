@@ -193,10 +193,9 @@ async function getData() {
           background-image: url("https://previews.123rf.com/images/krissiestudio/krissiestudio1507/krissiestudio150700007/43562529-colorful-background-for-kids.jpg");
          }
         body.notFound {
+          background-image: url("404.jpeg");
           background-image: url("404.png");
           background-image: url("https://www.sunfundone.com/images/404-error-template-3.png");
-          background-image: url("404.jpeg");
-          background-image: url("https://upload.wikimedia.org/wikipedia/commons/5/5f/Rexolene_and_Special_Lard_%281894%29_%28ADVERT_404%29.jpeg");
                     
           background-color: #cccccc;
         }
