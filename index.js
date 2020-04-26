@@ -16,7 +16,11 @@ const axios = require("axios");
 //get data from remote  server
 
 async function getData() {
-  const url = "http://localhost:3000/someextremelycomplicatedurl";
+  if (process.env.PORT) {
+    url = "https://joke-app-server.herokuapp.com/someextremelycomplicatedurl";
+  } else {
+    url = "http://localhost:3000/someextremelycomplicatedurl";
+  }
   try {
     const jokeServerResponse = await axios.get(url);
     // console.log("TEST from async func: ", jokeServerResponse.data);
@@ -89,7 +93,8 @@ async function getData() {
   </div>
   <div class="${divClass} down">
   <img src="${imageUrl}"/>
-  </div><a href="/${divClass}" class="myButton">How about another one?</a> `;
+  </div>
+  <a href="/${divClass}" class="myButton">How about another one?</a> `;
 
       return [html, divClass];
     }
@@ -156,7 +161,10 @@ async function getData() {
         }
         .down {
           background-color: white;
+          position: relative
         }
+         
+
         h1.choose {
           color: rgb(42, 42, 42);
         }
@@ -184,17 +192,12 @@ async function getData() {
         body.notFound {
           background-image: url("404.png");
           background-image: url("https://www.sunfundone.com/images/404-error-template-3.png");
-        };
-        background-image: url("404.jpeg");
+          background-image: url("404.jpeg");
           background-image: url("https://upload.wikimedia.org/wikipedia/commons/5/5f/Rexolene_and_Special_Lard_%281894%29_%28ADVERT_404%29.jpeg");
                     
           background-color: #cccccc;
         }
-        img {
-          
-          height: 100%;
-          width: 100%;
-        } 
+        
         .myButton {
           margin: 10px;
           box-shadow: 0px 10px 14px -7px #3e7327;
@@ -220,6 +223,10 @@ async function getData() {
           position:relative;
           top:1px;
         }
+        img {          
+          height: 100%;
+          width: 100%;
+        } 
         
     </style>
     </head>
