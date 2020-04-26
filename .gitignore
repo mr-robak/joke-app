@@ -1,1 +1,9 @@
-node_modules/
+node_modules
+convert.js
+test.js
+jokes.html
+styles.css
+.prettierignore
+data.json
+jokes.json
+plan.md

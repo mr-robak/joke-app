@@ -1,62 +1,148 @@
-// get file with jokes
-const jokes = require("./jokes");
+// const jokesDataJson = require("./data.json"); // get file with jokes
+const express = require("express"); // importing the request package so I can use it in this file
 
-// importing the request package so I can use it in this file
-const express = require("express");
+const app = express(); // creating a server
 
-// creating a server
-const app = express();
+// use $PORT if it is defined
+// use 5000 if $PORT is not defined
+const port = process.env.PORT || 5000;
 
-// define a port
-const port = 5000;
-
-// listen on port AND A Callback function
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
 
-// register GET  endpoint
-app.get(
-  "/:age", // route to listen on  //end point
-  //   on request function
-  function (request, response) {
-    // console.log(request.params);
-    const age = parseInt(request.params.age);
+const axios = require("axios");
 
-    if (isNaN(age)) {
-      response.send(`<h2>Please provide a number as a parameter</h2>`);
-    } else if (age < 18) {
-      const arrayJokes18minus = jokes.filter((joke) => joke.age === "-18");
-      const joke = arrayJokes18minus[returnRandomIndex(arrayJokes18minus)].joke;
-      response.send(renderPage(age, joke));
-    } else {
-      const arrayJokes18plus = jokes.filter((joke) => joke.age === "18+");
-      const joke = arrayJokes18plus[returnRandomIndex(arrayJokes18plus)].joke;
-      response.send(renderPage(age, joke));
+//get data from remote  server
+
+async function getData() {
+  const url = "http://localhost:3000/someextremelycomplicatedurl";
+  try {
+    const jokeServerResponse = await axios.get(url);
+    // console.log("TEST from async func: ", jokeServerResponse.data);
+    // get data out of JSON
+    const jokesDataJson = jokeServerResponse.data;
+    const { yomamma, chuck, yoImg, chuckImg } = jokesDataJson;
+
+    // register GET  endpoints
+    app.get("/", (request, response) => {
+      const title = "Choose!";
+      const htmlClass = renderHtml(title);
+      const page = renderPage(title, htmlClass);
+      response.send(page);
+    });
+
+    app.get(
+      "/:selection", // route to listen on  //end point
+      //   on request function
+      (request, response) => {
+        const select = request.params.selection;
+        const title =
+          select === "chuck"
+            ? "Chuck is The Man!"
+            : select === "tubbie"
+            ? "YO MOMMA!"
+            : "notFound";
+        const htmlClass = renderHtml(title);
+        const page = renderPage(title, htmlClass);
+        response.send(page);
+      }
+    );
+
+    function renderHtml(title) {
+      switch (title) {
+        case "Choose!":
+          htmlClass = [
+            `
+  <div class="choose">
+  <h1>How would you decribe yourself?</h1>
+  <h1>Are you more of a ...</h1>
+  <div class="lower">
+  <span><a href="/tubbie">Tubbie</a></h1></span>
+  <h2>or more of a</h2>
+  <span><a href="/chuck">Chuck?</a></span>
+  </div>
+  </div>`,
+            "choose",
+          ];
+          break;
+        case "YO MOMMA!":
+          htmlClass = renderJoke(title);
+          break;
+        case "Chuck is The Man!":
+          htmlClass = renderJoke(title);
+          break;
+        default:
+          htmlClass = ["", "notFound"];
+      }
+
+      return htmlClass;
     }
 
-    const webPage = renderPage(age); // assign result of a renderPage function to webPage const
+    function renderJoke(title) {
+      const divClass = title === "Chuck is The Man!" ? "chuck" : "tubbie";
+      const data = randomJokeImage(title);
+      const [joke, imageUrl] = data;
 
-    response.send(webPage); //send it to browser
-  }
-  // callback runs when the route is requested
-);
+      const html = `<div class="${divClass} up">
+  <h3>${joke}</h3>
+  </div>
+  <div class="${divClass} down">
+  <img src="${imageUrl}"/>
+  </div><a href="/${divClass}" class="myButton">How about another one?</a> `;
 
-function returnRandomIndex(array) {
-  return Math.floor(Math.random() * array.length);
-}
+      return [html, divClass];
+    }
 
-//HTML content
-function renderPage(age, joke) {
-  return `<!DOCTYPE html>
+    function randomJokeImage(title) {
+      [joke, imageUrl] =
+        title === "Chuck is The Man!"
+          ? [randomIndexItem(chuck), randomIndexItem(chuckImg)]
+          : [randomIndexItem(yomamma), randomIndexItem(yoImg)];
+      return [joke, imageUrl];
+    }
+
+    function randomIndexItem(array) {
+      arrItem = array[Math.floor(Math.random() * array.length)];
+      return arrItem;
+    }
+
+    //HTML content
+    function renderPage(title, htmlClass) {
+      const [html, divClass] = htmlClass;
+
+      return `<!DOCTYPE html>
   <html lang="en">
     <head>
       <meta charset="UTF-8" />
       <!-- <link rel="stylesheet" href="style.css" /> -->
-      <title>Your age is ${age}</title>
+      <title>${title}</title>
       <style>
         body {
+          text-align: center;
+          
+          /* Location of the image */
+          background-image: url(images/background-photo.jpg);
+          
+          /* Background image is centered vertically and horizontally at all times */
+          background-position: center center;
+          
+          /* Background image doesn't tile */
+          background-repeat: no-repeat;
+          
+          /* Background image is fixed in the viewport so that it doesn't move when 
+             the content's height is greater than the image's height */
+          background-attachment: fixed;
+          
+          /* This is what makes the background image rescale based
+             on the container's size */
+          background-size: cover;
+          
+          /* Set a background color that will be displayed
+             while the background image is loading */
+          
           background-color: rgb(223, 195, 161);
+
         }
         div {
           margin-top: 25px;
@@ -69,48 +155,83 @@ function renderPage(age, joke) {
           background-color: rgb(87, 136, 179);
         }
         .down {
-          background-color: rgb(119, 68, 85);
+          background-color: white;
         }
-        h2,
-        h3 {
+        h1.choose {
+          color: rgb(42, 42, 42);
+        }
+        .choose {
+          min-width: 200px;
+        }
+        .lower {
+          margin-top: 55px;
+        }
+        span {
+          font-size: 3em;
+          font: bolder;
+        }
+        h3.tubbie {
           color: white;
         }
-      </style>
+        body.chuck {
+          background-image: url("https://images.unsplash.com/photo-1558967574-5d07ca9a68c5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80");
+          background-color: #cccccc;
+        }
+
+        body.tubbie {
+          background-image: url("https://previews.123rf.com/images/krissiestudio/krissiestudio1507/krissiestudio150700007/43562529-colorful-background-for-kids.jpg");
+         }
+        body.notFound {
+          background-image: url("404.png");
+          background-image: url("https://www.sunfundone.com/images/404-error-template-3.png");
+        };
+        background-image: url("404.jpeg");
+          background-image: url("https://upload.wikimedia.org/wikipedia/commons/5/5f/Rexolene_and_Special_Lard_%281894%29_%28ADVERT_404%29.jpeg");
+                    
+          background-color: #cccccc;
+        }
+        img {
+          
+          height: 100%;
+          width: 100%;
+        } 
+        .myButton {
+          margin: 10px;
+          box-shadow: 0px 10px 14px -7px #3e7327;
+          background:linear-gradient(to bottom, #77b55a 5%, #72b352 100%);
+          background-color:#77b55a;
+          border-radius:4px;
+          border:1px solid #4b8f29;
+          display:inline-block;
+          cursor:pointer;
+          color:#ffffff;
+          font-family:Arial;
+          font-size:13px;
+          font-weight:bold;
+          padding:6px 12px;
+          text-decoration:none;
+          text-shadow:0px 1px 0px #5b8a3c;
+        }
+        .myButton:hover {
+          background:linear-gradient(to bottom, #72b352 5%, #77b55a 100%);
+          background-color:#72b352;
+        }
+        .myButton:active {
+          position:relative;
+          top:1px;
+        }
+        
+    </style>
     </head>
-    <body>
-      <div class="up">
-        <h2>
-          ${
-            age < 18
-              ? "Ok kiddo, here is a joke for you:"
-              : "Hey, you seem old enough, here is something for you:"
-          }
-        </h2>
-      </div>
-      <div class="down">
-        <h3>${joke}</h3>
-      </div>
+    <body class="${divClass}">
+        ${html}
     </body>
+    
   </html>
   `;
+    }
+  } catch (error) {
+    console.log("error.message test:", error.message);
+  }
 }
-
-// // GET /test handler callback function
-// function onRequest(request, response) {
-//     console.log(request.path);
-//     const page = render(request.params.age); //request.params.name comes from .get handler
-//     //   const page = render(request.params.gender);
-//     //   const page = render(request.params.name);
-
-//     response.send(page);
-//   }
-
-// app.get(
-//   "/student/:name ", // route to listen on  //end point
-//   // callback runs when the route is requested
-//   function (request, response) {
-//     console.log(request.params);
-//     const { age, nationality } = request.params;
-//     response.send(render(34, name));
-//   }
-// );
+getData();
